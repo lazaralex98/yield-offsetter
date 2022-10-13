@@ -1,6 +1,8 @@
 {
   "scripts": {
-    "verify": "yarn run hardhat verify"
+    "verify": "yarn run hardhat verify",
+    "solhint": "hardhat check",
+    "lint": "eslint '**/*.ts'"
   },
   "devDependencies": {
     "@ethersproject/abi": "^5.4.7",
@@ -10,13 +12,25 @@
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
     "@nomiclabs/hardhat-ethers": "^2.0.0",
     "@nomiclabs/hardhat-etherscan": "^3.1.1",
+    "@nomiclabs/hardhat-solhint": "^2.0.1",
     "@primitivefi/hardhat-dodoc": "^0.2.3",
     "@typechain/ethers-v5": "^10.1.0",
     "@typechain/hardhat": "^6.1.2",
     "@types/chai": "^4.2.0",
     "@types/mocha": "^9.1.0",
     "@types/node": ">=12.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.40.0",
+    "@typescript-eslint/parser": "^5.40.0",
     "chai": "^4.2.0",
+    "eslint": "^8.25.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin": "^1.0.1",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.1.0",
+    "eslint-plugin-simple-import-sort": "^8.0.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
     "ethers": "^5.4.7",
     "hardhat": "^2.12.0",
     "hardhat-contract-sizer": "^2.6.1",
@@ -24,6 +38,7 @@
     "hardhat-prettier": "^0.0.1",
     "prettier": "^2.7.1",
     "prettier-plugin-solidity": "^1.0.0-beta.24",
+    "solhint": "^3.3.7",
     "solidity-coverage": "^0.8.0",
     "ts-node": ">=8.0.0",
     "typechain": "^8.1.0",
