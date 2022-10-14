@@ -11,9 +11,36 @@ import '@openzeppelin/hardhat-upgrades';
 import { HardhatUserConfig } from 'hardhat/config';
 
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY;
+const PRIVATE_KEY = process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [];
+const POLYGON_ENDPOINT = process.env.POLYGON_ENDPOINT || 'https://matic-mainnet.chainstacklabs.com';
+const MUMBAI_ENDPOINT = process.env.MUMBAI_ENDPOINT || 'https://matic-mumbai.chainstacklabs.com';
 
 const config: HardhatUserConfig = {
-  solidity: '0.8.17',
+  defaultNetwork: 'hardhat',
+  solidity: {
+    version: '0.8.17',
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 500,
+      },
+    },
+  },
+  networks: {
+    polygon: {
+      url: POLYGON_ENDPOINT,
+      accounts: PRIVATE_KEY,
+    },
+    mumbai: {
+      url: MUMBAI_ENDPOINT,
+      accounts: PRIVATE_KEY,
+    },
+    hardhat: {
+      forking: {
+        url: POLYGON_ENDPOINT,
+      },
+    },
+  },
   contractSizer: {
     runOnCompile: true,
   },
