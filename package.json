@@ -3,7 +3,9 @@
     "verify": "yarn run hardhat verify",
     "solhint": "hardhat check",
     "lint": "eslint '**/*.ts'",
-    "typechain": "hardhat typechain"
+    "typechain": "hardhat typechain",
+    "compile": "yarn hardhat compile",
+    "test": "yarn hardhat test"
   },
   "devDependencies": {
     "@ethersproject/abi": "^5.4.7",
