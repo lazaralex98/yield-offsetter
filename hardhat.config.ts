@@ -3,6 +3,9 @@ import 'hardhat-contract-sizer';
 import '@primitivefi/hardhat-dodoc';
 import '@nomiclabs/hardhat-etherscan';
 import '@nomiclabs/hardhat-solhint';
+import '@typechain/hardhat';
+import '@nomiclabs/hardhat-ethers';
+import '@nomiclabs/hardhat-waffle';
 
 import { HardhatUserConfig } from 'hardhat/config';
 
