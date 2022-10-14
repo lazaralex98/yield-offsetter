@@ -43,7 +43,11 @@ contract YieldOffseterVault {
 
     /// @notice Calculates the amount of yield earned by the caller
     /// @return Amount of WMATIC extra of the supplied amount
-    function calculateYield() public view onlyVaultOwner returns (uint256) {}
+    function checkYield() public view onlyVaultOwner returns (uint256) {}
+
+    /// @notice Calculates how much CO2 your current yield could offset
+    /// @return Amount of CO2 that could be offset by the current yield
+    function calculateOffsetable() public view onlyVaultOwner returns (uint256) {}
 
     /// @notice Withdraws the earned yield from the Aave pool & uses it to offset CO2 emissions through the OffsetHelper
     function offsetYield() public onlyVaultOwner {}
