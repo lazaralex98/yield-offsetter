@@ -3,6 +3,7 @@ pragma solidity ^0.8.16;
 
 import {AavePool} from './interfaces/AaavePool.sol';
 import {WMatic} from './interfaces/WMatic.sol';
+import {IAToken} from './interfaces/IAToken.sol';
 import {YieldOffseterFactory} from './YieldOffseterFactory.sol';
 
 /// @title YieldOffseterVault
@@ -20,9 +21,16 @@ contract YieldOffseterVault {
     /// interface to the WMATIC token
     WMatic public immutable wMatic;
 
-    /// amounts of deposited WMATIC by each user into the YieldOffseter
-    /// @dev TODO could be turned into a nested mapping to allow multiple assets to be deposited
-    mapping(address => uint256) public deposits;
+    /// interface to the aWMATIC token
+    IAToken public immutable aWMatic;
+
+    /// amount of WMATIC held by user in the YieldOffseter
+    /// @dev TODO could be turned into a mapping to allow multiple assets to be deposited
+    uint256 public balance;
+
+    /// amount of WMATIC supplied to the Aave pool
+    /// @dev TODO could be turned into a mapping to allow multiple assets to be invested
+    uint256 public invested;
 
     // ============================================
     // ================ Modifiers =================
@@ -52,6 +60,7 @@ contract YieldOffseterVault {
         yieldOffseterFactory = YieldOffseterFactory(msg.sender);
         aavePool = AavePool(aavePoolAddress);
         wMatic = WMatic(wmaticAddress);
+        aWMatic = IAToken(aavePool.getReserveData(wmaticAddress).aTokenAddress);
     }
 
     // ============================================
@@ -61,14 +70,21 @@ contract YieldOffseterVault {
     /// @notice Send an amount of MATIC, that gets stored as WMATIC in this vault
     /// @dev TODO I'm keeping this MATIC native deposits because 1. it won't matter if we go multi-asset 2. Toucan offseting can only be done on Polygon for now
     function deposit() public payable onlyVaultOwner {
-        deposits[msg.sender] += msg.value;
+        balance += msg.value;
         wMatic.deposit{value: msg.value}();
         emit Deposit(msg.sender, msg.value);
     }
 
     /// @notice Supplies the Aave pool with an amount of deposited WMATIC
     /// @param amount Amount to be supplied
-    function supply(uint256 amount) public onlyVaultOwner {}
+    function supply(uint256 amount) public onlyVaultOwner {
+        require(balance >= amount, 'not enough deposited');
+        balance -= amount;
+        invested += amount;
+        bool approved = wMatic.approve(address(aavePool), amount);
+        require(approved, 'approve failed');
+        aavePool.supply(address(wMatic), amount, address(this), 0);
+    }
 
     /// @notice Calculates the amount of yield earned by the caller
     /// @return Amount of WMATIC extra of the supplied amount

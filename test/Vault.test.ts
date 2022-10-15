@@ -29,9 +29,9 @@ describe('YieldOffseterVault', function () {
       vault = await ethers.getContractAt('YieldOffseterVault', vaultAddress, addrs[0]);
     });
 
-    it('user should have deposits equal to 1.0 WMATIC in vault', async function () {
+    it('user should have balance equal to 1.0 WMATIC in vault', async function () {
       await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
-      expect(formatEther(await vault.deposits(addrs[0].address))).to.equal(formatEther(ONE_ETHER));
+      expect(formatEther(await vault.balance())).to.equal(formatEther(ONE_ETHER));
     });
 
     it('vault should have 1.0 WMATIC', async function () {
@@ -50,6 +50,41 @@ describe('YieldOffseterVault', function () {
       await expect(vault.connect(addrs[1]).deposit({ value: ONE_ETHER })).to.be.revertedWith(
         'not your vault'
       );
+    });
+  });
+
+  describe('Supplying Aave pool', function () {
+    let vault: YieldOffseterVault;
+
+    beforeEach(async function () {
+      await factory.connect(addrs[0]).createVault();
+      const vaultAddress = await factory.getVault(addrs[0].address);
+      vault = await ethers.getContractAt('YieldOffseterVault', vaultAddress, addrs[0]);
+    });
+
+    it('user should have balance equal to 0.0 WMATIC in vault', async function () {
+      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
+      await vault.connect(addrs[0]).supply(ONE_ETHER);
+      expect(formatEther(await vault.balance())).to.equal('0.0');
+    });
+
+    it('vault should have 0.0 WMATIC', async function () {
+      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
+      await vault.connect(addrs[0]).supply(ONE_ETHER);
+      const wmatic = new ethers.Contract(WMATIC, WMATIC_ABI, addrs[0]);
+      expect(formatEther(await wmatic.balanceOf(vault.address))).to.equal('0.0');
+    });
+
+    it('vault should have 1.0 aWMATIC', async function () {
+      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
+      await vault.connect(addrs[0]).supply(ONE_ETHER);
+      const aWmatic = await ethers.getContractAt('IAToken', await vault.aWMatic(), addrs[0]);
+      expect(formatEther(await aWmatic.balanceOf(vault.address))).to.equal(formatEther(ONE_ETHER));
+    });
+
+    it(`should fail because it's not this user's vault`, async function () {
+      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
+      await expect(vault.connect(addrs[1]).supply(ONE_ETHER)).to.be.revertedWith('not your vault');
     });
   });
 });

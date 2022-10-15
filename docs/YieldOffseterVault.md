@@ -10,6 +10,23 @@
 
 ## Methods
 
+### aWMatic
+
+```solidity
+function aWMatic() external view returns (contract IAToken)
+```
+
+interface to the aWMATIC token
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | contract IAToken | undefined |
+
 ### aavePool
 
 ```solidity
@@ -26,6 +43,23 @@ interface to the Aave pool
 | Name | Type | Description |
 |---|---|---|
 | _0 | contract AavePool | undefined |
+
+### balance
+
+```solidity
+function balance() external view returns (uint256)
+```
+
+amount of WMATIC held by user in the YieldOffseter
+
+*TODO could be turned into a mapping to allow multiple assets to be deposited*
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
 
 ### calculateOffsetable
 
@@ -72,21 +106,16 @@ Send an amount of MATIC, that gets stored as WMATIC in this vault
 *TODO I&#39;m keeping this MATIC native deposits because 1. it won&#39;t matter if we go multi-asset 2. Toucan offseting can only be done on Polygon for now*
 
 
-### deposits
+### invested
 
 ```solidity
-function deposits(address) external view returns (uint256)
+function invested() external view returns (uint256)
 ```
 
-amounts of deposited WMATIC by each user into the YieldOffseter
+amount of WMATIC supplied to the Aave pool
 
-*TODO could be turned into a nested mapping to allow multiple assets to be deposited*
+*TODO could be turned into a mapping to allow multiple assets to be invested*
 
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | undefined |
 
 #### Returns
 
