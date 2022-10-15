@@ -7,6 +7,10 @@ import {YieldOffseterFactory} from './YieldOffseterFactory.sol';
 
 /// @title YieldOffseterVault
 contract YieldOffseterVault {
+    // ============================================
+    // ================ State vars ================
+    // ============================================
+
     /// interface to the YieldOffseterFactory
     YieldOffseterFactory public immutable yieldOffseterFactory;
 
@@ -20,11 +24,28 @@ contract YieldOffseterVault {
     /// @dev TODO could be turned into a nested mapping to allow multiple assets to be deposited
     mapping(address => uint256) public deposits;
 
+    // ============================================
+    // ================ Modifiers =================
+    // ============================================
+
     /// Only the owner of the YieldOffseterVault can call this function
     modifier onlyVaultOwner() {
         require(address(this) == yieldOffseterFactory.getVault(msg.sender), 'not your vault');
         _;
     }
+
+    // ============================================
+    // ================== Events ==================
+    // ============================================
+
+    /// @notice Emitted when a user deposits MATIC into the YieldOffseterVault
+    /// @param _guy Address of the depositor
+    /// @param _amount Amount of MATIC deposited
+    event Deposit(address indexed _guy, uint256 _amount);
+
+    // ============================================
+    // ================ Constructor ===============
+    // ============================================
 
     /// @dev TODO this is not supposed to be deployable by anyone but the YieldOffseterFactory
     constructor(address _aavePool, address _wmatic) {
@@ -33,9 +54,17 @@ contract YieldOffseterVault {
         wMatic = WMatic(_wmatic);
     }
 
-    /// @notice Deposit an `amount` of MATIC, to be later supplied to the Aave pool as WMATIC
-    /// @param _amount Amount of tokens to be supplied
-    function deposit(uint256 _amount) public payable onlyVaultOwner {}
+    // ============================================
+    // =============== Public funcs ===============
+    // ============================================
+
+    /// @notice Send an amount of MATIC, that gets stored as WMATIC in this vault
+    /// @dev TODO I'm keeping this MATIC native deposits because 1. it won't matter if we go multi-asset 2. Toucan offseting can only be done on Polygon for now
+    function deposit() public payable onlyVaultOwner {
+        deposits[msg.sender] += msg.value;
+        wMatic.deposit{value: msg.value}();
+        emit Deposit(msg.sender, msg.value);
+    }
 
     /// @notice Supplies the Aave pool with an amount of deposited WMATIC
     /// @param _amount Amount to be supplied

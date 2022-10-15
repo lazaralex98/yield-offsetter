@@ -64,18 +64,13 @@ Calculates the amount of yield earned by the caller
 ### deposit
 
 ```solidity
-function deposit(uint256 _amount) external payable
+function deposit() external payable
 ```
 
 Deposit an `amount` of MATIC, to be later supplied to the Aave pool as WMATIC
 
 
 
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| _amount | uint256 | Amount of tokens to be supplied |
 
 ### deposits
 
@@ -192,6 +187,26 @@ interface to the YieldOffseterFactory
 |---|---|---|
 | _0 | contract YieldOffseterFactory | undefined |
 
+
+
+## Events
+
+### Deposit
+
+```solidity
+event Deposit(address indexed _guy, uint256 _amount)
+```
+
+Emitted when a user deposits MATIC into the YieldOffseterVault
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| _guy `indexed` | address | Address of the depositor |
+| _amount  | uint256 | Amount of MATIC deposited |
 
 
 
