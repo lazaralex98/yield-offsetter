@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.16;
 
 import {AavePool} from './interfaces/AaavePool.sol';
 import {WMatic} from './interfaces/WMatic.sol';
@@ -25,18 +25,18 @@ contract YieldOffseterFactory {
     // ============================================
 
     /// @notice Emitted when a new YieldOffseterVault is created
-    /// @param _owner Owner of the YieldOffseterVault
-    /// @param _vault Address of the YieldOffseterVault
-    event VaultCreated(address indexed _owner, address indexed _vault);
+    /// @param owner Owner of the YieldOffseterVault
+    /// @param vault Address of the YieldOffseterVault
+    event VaultCreated(address indexed owner, address indexed vault);
 
     // ============================================
     // ================ Constructor ===============
     // ============================================
 
     /// @dev TODO this is not supposed to be deployable by anyone but the YieldOffseterFactory
-    constructor(address _aavePool, address _wmatic) {
-        aavePool = AavePool(_aavePool);
-        wMatic = WMatic(_wmatic);
+    constructor(address aavePoolAddress, address wmaticAddress) {
+        aavePool = AavePool(aavePoolAddress);
+        wMatic = WMatic(wmaticAddress);
     }
 
     // ============================================
@@ -53,10 +53,10 @@ contract YieldOffseterFactory {
         return vaults[msg.sender];
     }
 
-    /// @notice Returns the YieldOffseterVault for `_guy`
-    /// @param _guy Address of the vault owner
-    /// @return Address of the YieldOffseterVault that `_guy` owns
-    function getVault(address _guy) public view returns (address) {
-        return vaults[_guy];
+    /// @notice Returns the YieldOffseterVault for `guy`
+    /// @param guy Address of the vault owner
+    /// @return Address of the YieldOffseterVault that `guy` owns
+    function getVault(address guy) public view returns (address) {
+        return vaults[guy];
     }
 }

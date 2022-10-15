@@ -47,10 +47,10 @@ Creates a YieldOffseterVault for the caller
 ### getVault
 
 ```solidity
-function getVault(address _guy) external view returns (address)
+function getVault(address guy) external view returns (address)
 ```
 
-Returns the YieldOffseterVault for `_guy`
+Returns the YieldOffseterVault for `guy`
 
 
 
@@ -58,13 +58,13 @@ Returns the YieldOffseterVault for `_guy`
 
 | Name | Type | Description |
 |---|---|---|
-| _guy | address | Address of the vault owner |
+| guy | address | Address of the vault owner |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the YieldOffseterVault that `_guy` owns |
+| _0 | address | Address of the YieldOffseterVault that `guy` owns |
 
 ### wMatic
 
@@ -90,7 +90,7 @@ interface to the WMATIC token
 ### VaultCreated
 
 ```solidity
-event VaultCreated(address indexed _owner, address indexed _vault)
+event VaultCreated(address indexed owner, address indexed vault)
 ```
 
 Emitted when a new YieldOffseterVault is created
@@ -101,8 +101,8 @@ Emitted when a new YieldOffseterVault is created
 
 | Name | Type | Description |
 |---|---|---|
-| _owner `indexed` | address | Owner of the YieldOffseterVault |
-| _vault `indexed` | address | Address of the YieldOffseterVault |
+| owner `indexed` | address | Owner of the YieldOffseterVault |
+| vault `indexed` | address | Address of the YieldOffseterVault |
 
 
 

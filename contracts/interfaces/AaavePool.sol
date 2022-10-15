@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.16;
 
 interface AavePool {
     /// @notice The `referralCode` is emitted in Supply event and can be for third party referral integrations.
