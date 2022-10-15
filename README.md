@@ -20,6 +20,7 @@ Note: The YieldOffseterVault also allows you to withdraw your funds at any time,
 
 ## Resources
 
+- https://github.com/aave/aave-v3-core/tree/master/contracts/interfaces
 - https://docs.aave.com/developers/core-contracts/pool
 - https://github.com/aave/aave-v3-core/blob/master/contracts/protocol/pool/Pool.sol
 - https://docs.aave.com/developers/deployed-contracts/v3-mainnet/polygon
