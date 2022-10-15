@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.16;
 
 import {AavePool} from './interfaces/AaavePool.sol';
 import {WMatic} from './interfaces/WMatic.sol';
@@ -39,19 +39,19 @@ contract YieldOffseterVault {
     // ============================================
 
     /// @notice Emitted when a user deposits MATIC into the YieldOffseterVault
-    /// @param _guy Address of the depositor
-    /// @param _amount Amount of MATIC deposited
-    event Deposit(address indexed _guy, uint256 _amount);
+    /// @param guy Address of the depositor
+    /// @param amount Amount of MATIC deposited
+    event Deposit(address indexed guy, uint256 amount);
 
     // ============================================
     // ================ Constructor ===============
     // ============================================
 
     /// @dev TODO this is not supposed to be deployable by anyone but the YieldOffseterFactory
-    constructor(address _aavePool, address _wmatic) {
+    constructor(address aavePoolAddress, address wmaticAddress) {
         yieldOffseterFactory = YieldOffseterFactory(msg.sender);
-        aavePool = AavePool(_aavePool);
-        wMatic = WMatic(_wmatic);
+        aavePool = AavePool(aavePoolAddress);
+        wMatic = WMatic(wmaticAddress);
     }
 
     // ============================================
@@ -67,8 +67,8 @@ contract YieldOffseterVault {
     }
 
     /// @notice Supplies the Aave pool with an amount of deposited WMATIC
-    /// @param _amount Amount to be supplied
-    function supply(uint256 _amount) public onlyVaultOwner {}
+    /// @param amount Amount to be supplied
+    function supply(uint256 amount) public onlyVaultOwner {}
 
     /// @notice Calculates the amount of yield earned by the caller
     /// @return Amount of WMATIC extra of the supplied amount
@@ -82,10 +82,10 @@ contract YieldOffseterVault {
     function offsetYield() public onlyVaultOwner {}
 
     /// @notice Withdraws the supplied WMATIC from the AavePool into the YieldOffseter
-    /// @param _amount Amount to be withdrawn
-    function withdraw(uint256 _amount) public onlyVaultOwner {}
+    /// @param amount Amount to be withdrawn
+    function withdraw(uint256 amount) public onlyVaultOwner {}
 
     /// @notice Withdraws the deposited WMATIC from the YieldOffseter
-    /// @param _amount Amount to be withdrawn
-    function withdraw2(uint256 _amount) public onlyVaultOwner {}
+    /// @param amount Amount to be withdrawn
+    function withdraw2(uint256 amount) public onlyVaultOwner {}
 }

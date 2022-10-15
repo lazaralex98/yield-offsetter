@@ -18,7 +18,7 @@ const MUMBAI_ENDPOINT = process.env.MUMBAI_ENDPOINT || 'https://matic-mumbai.cha
 const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
   solidity: {
-    version: '0.8.17',
+    version: '0.8.16',
     settings: {
       optimizer: {
         enabled: true,

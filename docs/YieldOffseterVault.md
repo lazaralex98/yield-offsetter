@@ -67,9 +67,9 @@ Calculates the amount of yield earned by the caller
 function deposit() external payable
 ```
 
-Deposit an `amount` of MATIC, to be later supplied to the Aave pool as WMATIC
+Send an amount of MATIC, that gets stored as WMATIC in this vault
 
-
+*TODO I&#39;m keeping this MATIC native deposits because 1. it won&#39;t matter if we go multi-asset 2. Toucan offseting can only be done on Polygon for now*
 
 
 ### deposits
@@ -108,7 +108,7 @@ Withdraws the earned yield from the Aave pool &amp; uses it to offset CO2 emissi
 ### supply
 
 ```solidity
-function supply(uint256 _amount) external nonpayable
+function supply(uint256 amount) external nonpayable
 ```
 
 Supplies the Aave pool with an amount of deposited WMATIC
@@ -119,7 +119,7 @@ Supplies the Aave pool with an amount of deposited WMATIC
 
 | Name | Type | Description |
 |---|---|---|
-| _amount | uint256 | Amount to be supplied |
+| amount | uint256 | Amount to be supplied |
 
 ### wMatic
 
@@ -141,7 +141,7 @@ interface to the WMATIC token
 ### withdraw
 
 ```solidity
-function withdraw(uint256 _amount) external nonpayable
+function withdraw(uint256 amount) external nonpayable
 ```
 
 Withdraws the supplied WMATIC from the AavePool into the YieldOffseter
@@ -152,12 +152,12 @@ Withdraws the supplied WMATIC from the AavePool into the YieldOffseter
 
 | Name | Type | Description |
 |---|---|---|
-| _amount | uint256 | Amount to be withdrawn |
+| amount | uint256 | Amount to be withdrawn |
 
 ### withdraw2
 
 ```solidity
-function withdraw2(uint256 _amount) external nonpayable
+function withdraw2(uint256 amount) external nonpayable
 ```
 
 Withdraws the deposited WMATIC from the YieldOffseter
@@ -168,7 +168,7 @@ Withdraws the deposited WMATIC from the YieldOffseter
 
 | Name | Type | Description |
 |---|---|---|
-| _amount | uint256 | Amount to be withdrawn |
+| amount | uint256 | Amount to be withdrawn |
 
 ### yieldOffseterFactory
 
@@ -194,7 +194,7 @@ interface to the YieldOffseterFactory
 ### Deposit
 
 ```solidity
-event Deposit(address indexed _guy, uint256 _amount)
+event Deposit(address indexed guy, uint256 amount)
 ```
 
 Emitted when a user deposits MATIC into the YieldOffseterVault
@@ -205,8 +205,8 @@ Emitted when a user deposits MATIC into the YieldOffseterVault
 
 | Name | Type | Description |
 |---|---|---|
-| _guy `indexed` | address | Address of the depositor |
-| _amount  | uint256 | Amount of MATIC deposited |
+| guy `indexed` | address | Address of the depositor |
+| amount  | uint256 | Amount of MATIC deposited |
 
 
 

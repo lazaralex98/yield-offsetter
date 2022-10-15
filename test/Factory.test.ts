@@ -27,7 +27,7 @@ describe('YieldOffseterFactory', function () {
     const tx = await factory.connect(addrs[0]).createVault();
     const receipt = await tx.wait();
     const event = receipt.events?.find((e) => e.event === 'VaultCreated');
-    expect(event?.args?._owner).to.equal(addrs[0].address);
+    expect(event?.args?.owner).to.equal(addrs[0].address);
   });
 
   it('should be able to get & interact with the vault', async function () {
