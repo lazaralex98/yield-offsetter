@@ -46,7 +46,7 @@ const config: HardhatUserConfig = {
   },
   dodoc: {
     runOnCompile: true,
-    exclude: ['contracts/interfaces'],
+    exclude: ['contracts/interfaces', '@openzeppelin'],
   },
   etherscan: {
     apiKey: ETHERSCAN_API_KEY,
