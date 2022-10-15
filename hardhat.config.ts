@@ -46,6 +46,7 @@ const config: HardhatUserConfig = {
   },
   dodoc: {
     runOnCompile: true,
+    exclude: ['contracts/interfaces'],
   },
   etherscan: {
     apiKey: ETHERSCAN_API_KEY,
