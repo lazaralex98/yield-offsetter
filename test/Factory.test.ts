@@ -1,11 +1,11 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { formatEther, getAddress, parseEther } from 'ethers/lib/utils';
+import { formatEther, parseEther } from 'ethers/lib/utils';
 import hre, { ethers } from 'hardhat';
 import { YieldOffseterFactory } from '../typechain-types';
+import { constants } from '../utils';
 
-const AAVE_POOL = getAddress('0x794a61358D6845594F94dc1DB02A252b5b4814aD');
-const WMATIC = getAddress('0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270');
+const { AAVE_POOL, WMATIC } = constants;
 
 describe('YieldOffseterFactory', function () {
   let addrs: SignerWithAddress[];
