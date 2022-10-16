@@ -86,9 +86,13 @@ contract YieldOffseterVault {
         aavePool.supply(address(wMatic), amount, address(this), 0);
     }
 
-    /// @notice Calculates the amount of yield earned by the caller
-    /// @return Amount of WMATIC extra of the supplied amount
-    function checkYield() public view onlyVaultOwner returns (uint256) {}
+    /// @notice Calculates the amount of yield earned by the caller up until this point
+    /// @return yield Amount of WMATIC extra of the amount supplied to Aave
+    function checkYield() public view onlyVaultOwner returns (uint256 yield) {
+        require(invested > 0, 'nothing invested');
+        uint256 aTokenBalance = aWMatic.balanceOf(address(this));
+        yield = aTokenBalance - invested;
+    }
 
     /// @notice Calculates how much CO2 your current yield could offset
     /// @return Amount of CO2 that could be offset by the current yield
