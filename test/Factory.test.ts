@@ -1,7 +1,7 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { formatEther, parseEther } from 'ethers/lib/utils';
 import hre, { ethers } from 'hardhat';
+
 import { YieldOffseterFactory } from '../typechain-types';
 import { constants } from '../utils';
 

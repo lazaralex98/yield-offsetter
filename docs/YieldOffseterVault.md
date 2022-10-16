@@ -81,10 +81,10 @@ Calculates how much CO2 your current yield could offset
 ### checkYield
 
 ```solidity
-function checkYield() external view returns (uint256)
+function checkYield() external view returns (uint256 yield)
 ```
 
-Calculates the amount of yield earned by the caller
+Calculates the amount of yield earned by the caller up until this point
 
 
 
@@ -93,7 +93,7 @@ Calculates the amount of yield earned by the caller
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | Amount of WMATIC extra of the supplied amount |
+| yield | uint256 | Amount of WMATIC extra of the amount supplied to Aave |
 
 ### deposit
 
