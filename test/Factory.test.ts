@@ -14,7 +14,15 @@ describe('YieldOffseterFactory', function () {
   beforeEach(async function () {
     addrs = await ethers.getSigners();
 
-    const Factory = await hre.ethers.getContractFactory('YieldOffseterFactory');
+    const SwappingLogicFactory = await hre.ethers.getContractFactory('SwappingLogic');
+    const swappingLogic = await SwappingLogicFactory.deploy();
+    await swappingLogic.deployed();
+
+    const Factory = await hre.ethers.getContractFactory('YieldOffseterFactory', {
+      libraries: {
+        SwappingLogic: swappingLogic.address,
+      },
+    });
     factory = await Factory.connect(addrs[0]).deploy(AAVE_POOL, WMATIC);
     await factory.deployed();
   });

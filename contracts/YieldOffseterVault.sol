@@ -5,6 +5,7 @@ import {AavePool} from './interfaces/AaavePool.sol';
 import {WMatic} from './interfaces/WMatic.sol';
 import {IAToken} from './interfaces/IAToken.sol';
 import {YieldOffseterFactory} from './YieldOffseterFactory.sol';
+import {SwappingLogic} from './libraries/SwappingLogic.sol';
 
 /// @title YieldOffseterVault
 contract YieldOffseterVault {
@@ -91,12 +92,18 @@ contract YieldOffseterVault {
     function checkYield() public view onlyVaultOwner returns (uint256 yield) {
         require(invested > 0, 'nothing invested');
         uint256 aTokenBalance = aWMatic.balanceOf(address(this));
+        // TODO use SafeMath because this can underflow
         yield = aTokenBalance - invested;
     }
 
-    /// @notice Calculates how much CO2 your current yield could offset
-    /// @return Amount of CO2 that could be offset by the current yield
-    function calculateOffsetable() public view onlyVaultOwner returns (uint256) {}
+    /// @notice Calculates how much TCO2 your current yield could offset
+    /// @return offsetable Amount of TCO2 that could be offset by the current yield
+    function calculateOffsetable() public view onlyVaultOwner returns (uint256 offsetable) {
+        uint256 yield = checkYield();
+        require(yield > 0, 'no yield');
+        (, uint256[] memory amounts) = SwappingLogic.calculateSwap(yield, address(wMatic));
+        offsetable = amounts[amounts.length - 1];
+    }
 
     /// @notice Withdraws the earned yield from the Aave pool & uses it to offset CO2 emissions through the OffsetHelper
     function offsetYield() public onlyVaultOwner {}
