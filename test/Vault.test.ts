@@ -9,8 +9,6 @@ import { ABIs, constants, funcs } from '../utils';
 const { WMATIC_ABI } = ABIs;
 const { AAVE_POOL, WMATIC, ONE_ETHER } = constants;
 
-// TODO add chai expect messages for better error logging
-
 describe('YieldOffseterVault', function () {
   let addrs: SignerWithAddress[];
   let factory: YieldOffseterFactory;
@@ -42,19 +40,25 @@ describe('YieldOffseterVault', function () {
 
     it('user should have balance equal to 1.0 WMATIC in vault', async function () {
       await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
-      expect(formatEther(await vault.balance())).to.equal(formatEther(ONE_ETHER));
+      expect(formatEther(await vault.balance())).to.equal(
+        formatEther(ONE_ETHER),
+        'Balance should be 1.0 WMATIC'
+      );
     });
 
     it('vault should have 1.0 WMATIC', async function () {
       await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
       const wmatic = new ethers.Contract(WMATIC, WMATIC_ABI, addrs[0]);
-      expect(formatEther(await wmatic.balanceOf(vault.address))).to.equal(formatEther(ONE_ETHER));
+      expect(formatEther(await wmatic.balanceOf(vault.address))).to.equal(
+        formatEther(ONE_ETHER),
+        'Vault should have 1.0 WMATIC'
+      );
     });
 
     it('vault should have 0.0 MATIC', async function () {
       await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
       const balance = await ethers.provider.getBalance(vault.address);
-      expect(formatEther(balance)).to.equal('0.0');
+      expect(formatEther(balance)).to.equal('0.0', "Vault shouldn't have any MATIC");
     });
 
     it(`should fail because it's not this user's vault`, async function () {
@@ -76,21 +80,30 @@ describe('YieldOffseterVault', function () {
     it('user should have balance equal to 0.0 WMATIC in vault', async function () {
       await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
       await vault.connect(addrs[0]).supply(ONE_ETHER);
-      expect(formatEther(await vault.balance())).to.equal('0.0');
+      expect(formatEther(await vault.balance())).to.equal(
+        '0.0',
+        'User should have 0.0 WMATIC balance in vault'
+      );
     });
 
     it('vault should have 0.0 WMATIC', async function () {
       await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
       await vault.connect(addrs[0]).supply(ONE_ETHER);
       const wmatic = new ethers.Contract(WMATIC, WMATIC_ABI, addrs[0]);
-      expect(formatEther(await wmatic.balanceOf(vault.address))).to.equal('0.0');
+      expect(formatEther(await wmatic.balanceOf(vault.address))).to.equal(
+        '0.0',
+        "Vault shouldn't have any WMATIC"
+      );
     });
 
     it('vault should have 1.0 aWMATIC', async function () {
       await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
       await vault.connect(addrs[0]).supply(ONE_ETHER);
       const aWmatic = await ethers.getContractAt('IAToken', await vault.aWMatic(), addrs[0]);
-      expect(formatEther(await aWmatic.balanceOf(vault.address))).to.equal(formatEther(ONE_ETHER));
+      expect(formatEther(await aWmatic.balanceOf(vault.address))).to.equal(
+        formatEther(ONE_ETHER),
+        'Vault should have 1.0 aWMATIC'
+      );
     });
 
     it(`should fail because it's not this user's vault`, async function () {
@@ -111,7 +124,10 @@ describe('YieldOffseterVault', function () {
     it('user should have yield == 0.0', async function () {
       await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
       await vault.connect(addrs[0]).supply(ONE_ETHER);
-      expect(formatEther(await vault.checkYield())).to.equal('0.0');
+      expect(formatEther(await vault.checkYield())).to.equal(
+        '0.0',
+        "User shouldn't have any yield"
+      );
     });
 
     it('user should have yield > 0.0 after a certain amount of blocks have been mined', async function () {
@@ -121,7 +137,7 @@ describe('YieldOffseterVault', function () {
       await funcs.mineBlocks(hre, 1000, 10);
 
       const yieldAmount = await vault.connect(addrs[0]).checkYield();
-      expect(yieldAmount).to.be.gt(parseEther('0.0'));
+      expect(yieldAmount).to.be.gt(parseEther('0.0'), 'User should have yield');
     });
 
     it('checking yield should fail because user has not invested yet', async function () {
