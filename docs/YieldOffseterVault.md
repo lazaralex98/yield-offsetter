@@ -64,10 +64,10 @@ amount of WMATIC held by user in the YieldOffseter
 ### calculateOffsetable
 
 ```solidity
-function calculateOffsetable() external view returns (uint256)
+function calculateOffsetable() external view returns (uint256 offsetable)
 ```
 
-Calculates how much CO2 your current yield could offset
+Calculates how much TCO2 your current yield could offset
 
 
 
@@ -76,7 +76,7 @@ Calculates how much CO2 your current yield could offset
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | Amount of CO2 that could be offset by the current yield |
+| offsetable | uint256 | Amount of TCO2 that could be offset by the current yield |
 
 ### checkYield
 

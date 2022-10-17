@@ -9,6 +9,8 @@ import { ABIs, constants, funcs } from '../utils';
 const { WMATIC_ABI } = ABIs;
 const { AAVE_POOL, WMATIC, ONE_ETHER } = constants;
 
+// TODO add chai expect messages for better error logging
+
 describe('YieldOffseterVault', function () {
   let addrs: SignerWithAddress[];
   let factory: YieldOffseterFactory;
@@ -16,7 +18,15 @@ describe('YieldOffseterVault', function () {
   beforeEach(async function () {
     addrs = await ethers.getSigners();
 
-    const Factory = await hre.ethers.getContractFactory('YieldOffseterFactory');
+    const SwappingLogicFactory = await hre.ethers.getContractFactory('SwappingLogic');
+    const swappingLogic = await SwappingLogicFactory.deploy();
+    await swappingLogic.deployed();
+
+    const Factory = await hre.ethers.getContractFactory('YieldOffseterFactory', {
+      libraries: {
+        SwappingLogic: swappingLogic.address,
+      },
+    });
     factory = await Factory.connect(addrs[0]).deploy(AAVE_POOL, WMATIC);
     await factory.deployed();
   });
@@ -126,6 +136,50 @@ describe('YieldOffseterVault', function () {
       await funcs.mineBlocks(hre, 1000, 10);
 
       await expect(vault.connect(addrs[1]).checkYield()).to.be.revertedWith('not your vault');
+    });
+  });
+
+  describe('Calculate offsetable TCO2', function () {
+    let vault: YieldOffseterVault;
+
+    beforeEach(async function () {
+      await factory.connect(addrs[0]).createVault();
+      const vaultAddress = await factory.getVault(addrs[0].address);
+      vault = await ethers.getContractAt('YieldOffseterVault', vaultAddress, addrs[0]);
+    });
+
+    it('user should have offsetable > 0.0 after a certain amount of blocks have been mined', async function () {
+      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
+      await vault.connect(addrs[0]).supply(ONE_ETHER);
+
+      await funcs.mineBlocks(hre, 1000, 10);
+
+      const offsetable = await vault.connect(addrs[0]).calculateOffsetable();
+      expect(offsetable).to.be.gt(parseEther('0.0'), 'Offsetable should be > 0.0');
+    });
+
+    it('should fail because user has not invested yet', async function () {
+      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
+
+      await expect(vault.connect(addrs[0]).calculateOffsetable()).to.be.revertedWith(
+        'nothing invested'
+      );
+    });
+
+    it('should fail because user has no yield yet', async function () {
+      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
+      await vault.connect(addrs[0]).supply(ONE_ETHER);
+      await expect(vault.connect(addrs[0]).calculateOffsetable()).to.be.revertedWith('no yield');
+    });
+
+    it('should fail because user does not own the vault', async function () {
+      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
+      await vault.connect(addrs[0]).supply(ONE_ETHER);
+      await funcs.mineBlocks(hre, 1000, 10);
+
+      await expect(vault.connect(addrs[1]).calculateOffsetable()).to.be.revertedWith(
+        'not your vault'
+      );
     });
   });
 });
