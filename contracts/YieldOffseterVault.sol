@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.16;
 
+import {SafeMath} from '@openzeppelin/contracts/utils/math/SafeMath.sol';
+
 import {AavePool} from './interfaces/AaavePool.sol';
 import {WMatic} from './interfaces/WMatic.sol';
 import {IAToken} from './interfaces/IAToken.sol';
@@ -92,8 +94,8 @@ contract YieldOffseterVault {
     function checkYield() public view onlyVaultOwner returns (uint256 yield) {
         require(invested > 0, 'nothing invested');
         uint256 aTokenBalance = aWMatic.balanceOf(address(this));
-        // TODO use SafeMath because this can underflow
-        yield = aTokenBalance - invested;
+        // we are using SafeMath her because there was a sporadic underflow issue in testing
+        yield = SafeMath.sub(aTokenBalance, invested);
     }
 
     /// @notice Calculates how much TCO2 your current yield could offset
