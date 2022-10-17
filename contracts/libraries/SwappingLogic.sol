@@ -12,6 +12,28 @@ library SwappingLogic {
 
     IUniswapV2Router02 private constant ROUTER = IUniswapV2Router02(SWAP_ROUTER);
 
+    /// @notice Swaps an amount `amountIn` of `from` tokens for NCT
+    /// @dev Makes external calls to the swap router
+    /// @param amountIn Amount of `from` tokens to swap
+    /// @param from Address of the token to swap from
+    /// @return amountOut Amount of NCT received
+    function swapToCarbon(uint256 amountIn, address from) external returns (uint256 amountOut) {
+        (address[] memory path, uint256[] memory amounts) = calculateSwap(amountIn, from);
+        uint256 len = path.length;
+
+        bool approved = IERC20(from).approve(SWAP_ROUTER, amounts[0]);
+        require(approved, 'approve failed');
+
+        uint256[] memory receivedAmounts = ROUTER.swapExactTokensForTokens(
+            amounts[0],
+            amounts[len - 1],
+            path,
+            address(this),
+            block.timestamp
+        );
+        return receivedAmounts[len - 1];
+    }
+
     /// @notice Calculates the amount of NCT that will be received from swapping `amountIn` of `from` tokens
     /// @dev Makes external calls to the swap router
     /// @param amountIn The amount of `from` tokens to swap
