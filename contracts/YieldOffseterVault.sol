@@ -74,8 +74,8 @@ contract YieldOffseterVault {
     /// @dev TODO I'm keeping this MATIC native deposits because 1. it won't matter if we go multi-asset 2. Toucan offseting can only be done on Polygon for now
     function deposit() public payable onlyVaultOwner {
         balance += msg.value;
-        wMatic.deposit{value: msg.value}();
         emit Deposit(msg.sender, msg.value);
+        wMatic.deposit{value: msg.value}();
     }
 
     /// @notice Supplies the Aave pool with an amount of deposited WMATIC
