@@ -54,6 +54,26 @@ contract YieldOffseterVault {
     /// @param amount Amount of MATIC deposited
     event Deposit(address indexed guy, uint256 amount);
 
+    /// @notice Emitted when a user supplies MATIC to the Aave pool
+    /// @param guy Address of the supplier / investor
+    /// @param amount Amount of MATIC supplied
+    event Invest(address indexed guy, uint256 amount);
+
+    /// @notice Emitted when a user offsets their yield
+    /// @param guy Address of the yield offseter
+    /// @param amount Amount of MATIC offset
+    event Offset(address indexed guy, uint256 amount);
+
+    /// @notice Emitted when a user withdraws MATIC from Aave pool into the YieldOffseterVault
+    /// @param guy Address of the withdrawer
+    /// @param amount Amount of MATIC withdrawn
+    event Withdraw(address indexed guy, uint256 amount);
+
+    /// @notice Emitted when a user withdraws MATIC from the YieldOffseterVault
+    /// @param guy Address of the withdrawer
+    /// @param amount Amount of MATIC withdrawn
+    event Withdraw2(address indexed guy, uint256 amount);
+
     // ============================================
     // ================ Constructor ===============
     // ============================================
@@ -84,6 +104,7 @@ contract YieldOffseterVault {
         require(balance >= amount, 'not enough deposited');
         balance -= amount;
         invested += amount;
+        emit Invest(msg.sender, amount);
         bool approved = wMatic.approve(address(aavePool), amount);
         require(approved, 'approve failed');
         aavePool.supply(address(wMatic), amount, address(this), 0);
