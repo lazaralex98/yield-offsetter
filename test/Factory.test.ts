@@ -2,7 +2,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
 import hre, { ethers } from 'hardhat';
 
-import { YieldOffseterFactory } from '../typechain-types';
+import { Errors, YieldOffseterFactory } from '../typechain-types';
 import { constants } from '../utils';
 
 const { AAVE_POOL, WMATIC } = constants;
@@ -10,6 +10,13 @@ const { AAVE_POOL, WMATIC } = constants;
 describe('YieldOffseterFactory', function () {
   let addrs: SignerWithAddress[];
   let factory: YieldOffseterFactory;
+  let errors: Errors;
+
+  before(async function () {
+    const Errors = await hre.ethers.getContractFactory('Errors');
+    errors = await Errors.deploy();
+    await errors.deployed();
+  });
 
   beforeEach(async function () {
     addrs = await ethers.getSigners();
@@ -17,6 +24,10 @@ describe('YieldOffseterFactory', function () {
     const SwappingLogicFactory = await hre.ethers.getContractFactory('SwappingLogic');
     const swappingLogic = await SwappingLogicFactory.deploy();
     await swappingLogic.deployed();
+
+    const Errors = await hre.ethers.getContractFactory('Errors');
+    const errors = await Errors.deploy();
+    await errors.deployed();
 
     const Factory = await hre.ethers.getContractFactory('YieldOffseterFactory', {
       libraries: {
@@ -49,7 +60,7 @@ describe('YieldOffseterFactory', function () {
   it('should fail to create a second vault', async function () {
     await factory.connect(addrs[0]).createVault();
     await expect(factory.connect(addrs[0]).createVault()).to.be.revertedWith(
-      'vault already exists'
+      await errors.F_ALREADY_HAVE_VAULT()
     );
   });
 });

@@ -4,6 +4,7 @@ pragma solidity ^0.8.16;
 import {AavePool} from './interfaces/AaavePool.sol';
 import {WMatic} from './interfaces/WMatic.sol';
 import {YieldOffseterVault} from './YieldOffseterVault.sol';
+import {Errors} from './libraries/Errors.sol';
 
 /// @title YieldOffseterFactory
 contract YieldOffseterFactory {
@@ -46,7 +47,7 @@ contract YieldOffseterFactory {
     /// @notice Creates a YieldOffseterVault for the caller
     /// @return Address of the newly created YieldOffseterVault
     function createVault() public returns (address) {
-        require(vaults[msg.sender] == address(0), 'vault already exists');
+        require(vaults[msg.sender] == address(0), Errors.F_ALREADY_HAVE_VAULT);
         YieldOffseterVault newVault = new YieldOffseterVault(address(aavePool), address(wMatic));
         vaults[msg.sender] = address(newVault);
         emit VaultCreated(msg.sender, vaults[msg.sender]);

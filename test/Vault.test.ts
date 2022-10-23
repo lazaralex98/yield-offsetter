@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { formatEther, parseEther } from 'ethers/lib/utils';
 import hre, { ethers } from 'hardhat';
 
-import { YieldOffseterFactory, YieldOffseterVault } from '../typechain-types';
+import { Errors, YieldOffseterFactory, YieldOffseterVault } from '../typechain-types';
 import { ABIs, constants, funcs } from '../utils';
 
 const { WMATIC_ABI } = ABIs;
@@ -12,6 +12,13 @@ const { AAVE_POOL, WMATIC, ONE_ETHER } = constants;
 describe('YieldOffseterVault', function () {
   let addrs: SignerWithAddress[];
   let factory: YieldOffseterFactory;
+  let errors: Errors;
+
+  before(async function () {
+    const Errors = await hre.ethers.getContractFactory('Errors');
+    errors = await Errors.deploy();
+    await errors.deployed();
+  });
 
   beforeEach(async function () {
     addrs = await ethers.getSigners();
@@ -19,6 +26,10 @@ describe('YieldOffseterVault', function () {
     const SwappingLogicFactory = await hre.ethers.getContractFactory('SwappingLogic');
     const swappingLogic = await SwappingLogicFactory.deploy();
     await swappingLogic.deployed();
+
+    const Errors = await hre.ethers.getContractFactory('Errors');
+    const errors = await Errors.deploy();
+    await errors.deployed();
 
     const Factory = await hre.ethers.getContractFactory('YieldOffseterFactory', {
       libraries: {
@@ -63,7 +74,7 @@ describe('YieldOffseterVault', function () {
 
     it(`should fail because it's not this user's vault`, async function () {
       await expect(vault.connect(addrs[1]).deposit({ value: ONE_ETHER })).to.be.revertedWith(
-        'not your vault'
+        await errors.V_NOT_VAULT_OWNER()
       );
     });
   });
@@ -108,7 +119,9 @@ describe('YieldOffseterVault', function () {
 
     it(`should fail because it's not this user's vault`, async function () {
       await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
-      await expect(vault.connect(addrs[1]).supply(ONE_ETHER)).to.be.revertedWith('not your vault');
+      await expect(vault.connect(addrs[1]).supply(ONE_ETHER)).to.be.revertedWith(
+        await errors.V_NOT_VAULT_OWNER()
+      );
     });
   });
 
@@ -147,7 +160,7 @@ describe('YieldOffseterVault', function () {
 
       await expect(
         vault.connect(addrs[1]).getYield(await vault.getATokenBalance())
-      ).to.be.revertedWith('not your vault');
+      ).to.be.revertedWith(await errors.V_NOT_VAULT_OWNER());
     });
   });
 
@@ -188,7 +201,7 @@ describe('YieldOffseterVault', function () {
 
       await expect(
         vault.connect(addrs[1]).getOffsetable(await vault.getYield(await vault.getATokenBalance()))
-      ).to.be.revertedWith('not your vault');
+      ).to.be.revertedWith(await errors.V_NOT_VAULT_OWNER());
     });
   });
 });

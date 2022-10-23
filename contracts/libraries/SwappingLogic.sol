@@ -3,6 +3,7 @@ pragma solidity ^0.8.16;
 
 import {IUniswapV2Router02} from '@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import {Errors} from './Errors.sol';
 
 /// @title SwappingLogic
 library SwappingLogic {
@@ -22,7 +23,7 @@ library SwappingLogic {
         uint256 len = path.length;
 
         bool approved = IERC20(from).approve(SWAP_ROUTER, amounts[0]);
-        require(approved, 'approve failed');
+        require(approved, Errors.G_APPROVAL_FAILED);
 
         uint256[] memory receivedAmounts = ROUTER.swapExactTokensForTokens(
             amounts[0],
@@ -47,7 +48,7 @@ library SwappingLogic {
     {
         path = buildPath(from);
         amounts = ROUTER.getAmountsOut(amountIn, path);
-        require(path.length == amounts.length, 'path and amounts length mismatch');
+        require(path.length == amounts.length, Errors.G_ARRAYS_NOT_SAME_LENGTH);
     }
 
     /// @notice Builds the path to be used for swapping `from` to NCT

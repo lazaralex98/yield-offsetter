@@ -8,6 +8,7 @@ import {WMatic} from './interfaces/WMatic.sol';
 import {IAToken} from './interfaces/IAToken.sol';
 import {YieldOffseterFactory} from './YieldOffseterFactory.sol';
 import {SwappingLogic} from './libraries/SwappingLogic.sol';
+import {Errors} from './libraries/Errors.sol';
 
 /// @title YieldOffseterVault
 contract YieldOffseterVault {
@@ -41,7 +42,10 @@ contract YieldOffseterVault {
 
     /// Only the owner of the YieldOffseterVault can call this function
     modifier onlyVaultOwner() {
-        require(address(this) == yieldOffseterFactory.getVault(msg.sender), 'not your vault');
+        require(
+            address(this) == yieldOffseterFactory.getVault(msg.sender),
+            Errors.V_NOT_VAULT_OWNER
+        );
         _;
     }
 
@@ -101,12 +105,12 @@ contract YieldOffseterVault {
     /// @notice Supplies the Aave pool with an amount of deposited WMATIC
     /// @param amount Amount to be supplied
     function supply(uint256 amount) public onlyVaultOwner {
-        require(balance >= amount, 'not enough deposited');
+        require(balance >= amount, Errors.V_NOT_ENOUGH_DEPOSITED);
         balance -= amount;
         invested += amount;
         emit Invest(msg.sender, amount);
         bool approved = wMatic.approve(address(aavePool), amount);
-        require(approved, 'approve failed');
+        require(approved, Errors.G_APPROVAL_FAILED);
         aavePool.supply(address(wMatic), amount, address(this), 0);
     }
 
