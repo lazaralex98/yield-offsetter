@@ -129,6 +129,7 @@ contract YieldOffseterVault {
     /// @param amount Amount of aWMATIC tokens the caller holds within the vault
     /// @return yield Amount of WMATIC extra of the amount supplied to Aave
     function getYield(uint256 amount) public view onlyVaultOwner returns (uint256 yield) {
+        // TODO what happens if amount is bigger than invested?
         // we are using SafeMath here because there was a sporadic underflow issue in testing
         yield = SafeMath.sub(amount, invested);
     }
