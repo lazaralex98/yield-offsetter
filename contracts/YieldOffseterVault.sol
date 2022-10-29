@@ -113,7 +113,6 @@ contract YieldOffseterVault {
     /// @notice Calculates the amount of yield earned by the caller up until this point
     /// @return yield Amount of WMATIC extra of the amount supplied to Aave
     function checkYield() public view onlyVaultOwner returns (uint256 yield) {
-        require(invested > 0, 'nothing invested');
         uint256 aTokenBalance = aWMatic.balanceOf(address(this));
         // we are using SafeMath her because there was a sporadic underflow issue in testing
         yield = SafeMath.sub(aTokenBalance, invested);

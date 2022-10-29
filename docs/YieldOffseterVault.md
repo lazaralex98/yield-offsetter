@@ -237,5 +237,73 @@ Emitted when a user deposits MATIC into the YieldOffseterVault
 | guy `indexed` | address | Address of the depositor |
 | amount  | uint256 | Amount of MATIC deposited |
 
+### Invest
+
+```solidity
+event Invest(address indexed guy, uint256 amount)
+```
+
+Emitted when a user supplies MATIC to the Aave pool
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| guy `indexed` | address | Address of the supplier / investor |
+| amount  | uint256 | Amount of MATIC supplied |
+
+### Offset
+
+```solidity
+event Offset(address indexed guy, uint256 amount)
+```
+
+Emitted when a user offsets their yield
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| guy `indexed` | address | Address of the yield offseter |
+| amount  | uint256 | Amount of MATIC offset |
+
+### Withdraw
+
+```solidity
+event Withdraw(address indexed guy, uint256 amount)
+```
+
+Emitted when a user withdraws MATIC from Aave pool into the YieldOffseterVault
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| guy `indexed` | address | Address of the withdrawer |
+| amount  | uint256 | Amount of MATIC withdrawn |
+
+### Withdraw2
+
+```solidity
+event Withdraw2(address indexed guy, uint256 amount)
+```
+
+Emitted when a user withdraws MATIC from the YieldOffseterVault
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| guy `indexed` | address | Address of the withdrawer |
+| amount  | uint256 | Amount of MATIC withdrawn |
+
 
 

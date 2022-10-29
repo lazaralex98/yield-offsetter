@@ -140,12 +140,6 @@ describe('YieldOffseterVault', function () {
       expect(yieldAmount).to.be.gt(parseEther('0.0'), 'User should have yield');
     });
 
-    it('checking yield should fail because user has not invested yet', async function () {
-      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
-
-      await expect(vault.connect(addrs[0]).checkYield()).to.be.revertedWith('nothing invested');
-    });
-
     it('checking yield should fail because user does not own the vault', async function () {
       await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
       await vault.connect(addrs[0]).supply(ONE_ETHER);
@@ -172,14 +166,6 @@ describe('YieldOffseterVault', function () {
 
       const offsetable = await vault.connect(addrs[0]).calculateOffsetable();
       expect(offsetable).to.be.gt(parseEther('0.0'), 'Offsetable should be > 0.0');
-    });
-
-    it('should fail because user has not invested yet', async function () {
-      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
-
-      await expect(vault.connect(addrs[0]).calculateOffsetable()).to.be.revertedWith(
-        'nothing invested'
-      );
     });
 
     it('should fail because user has no yield yet', async function () {
