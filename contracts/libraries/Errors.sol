@@ -24,4 +24,8 @@ library Errors {
     string public constant G_ARRAYS_NOT_SAME_LENGTH = '5';
     /// User doesn't have enough NCT to retire
     string public constant R_INSUFFICIENT_NCT = '6';
+    /// Amount provided cannot be 0
+    string public constant G_AMOUNT_ZERO = '7';
+    /// User doesn't have enough yield to offset that much
+    string public constant V_NOT_ENOUGH_YIELD = '8';
 }

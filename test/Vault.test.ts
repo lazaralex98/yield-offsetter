@@ -31,9 +31,14 @@ describe('YieldOffseterVault', function () {
     const errors = await Errors.deploy();
     await errors.deployed();
 
+    const RetirementLogicFactory = await hre.ethers.getContractFactory('RetirementLogic');
+    const retirementLogic = await RetirementLogicFactory.deploy();
+    await retirementLogic.deployed();
+
     const Factory = await hre.ethers.getContractFactory('YieldOffseterFactory', {
       libraries: {
         SwappingLogic: swappingLogic.address,
+        RetirementLogic: retirementLogic.address,
       },
     });
     factory = await Factory.connect(addrs[0]).deploy(AAVE_POOL, WMATIC);
@@ -202,6 +207,87 @@ describe('YieldOffseterVault', function () {
       await expect(
         vault.connect(addrs[1]).getOffsetable(await vault.getYield(await vault.getATokenBalance()))
       ).to.be.revertedWith(await errors.V_NOT_VAULT_OWNER());
+    });
+  });
+
+  describe('Offset CO2', function () {
+    let vault: YieldOffseterVault;
+
+    beforeEach(async function () {
+      await factory.connect(addrs[0]).createVault();
+      const vaultAddress = await factory.getVault(addrs[0].address);
+      vault = await ethers.getContractAt('YieldOffseterVault', vaultAddress, addrs[0]);
+    });
+
+    it('should offset CO2 using all of the yield', async function () {
+      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
+      await vault.connect(addrs[0]).supply(ONE_ETHER);
+
+      await funcs.mineBlocks(hre, 1000, 10);
+
+      const yieldAmount = await vault.connect(addrs[0]).getYield(await vault.getATokenBalance());
+
+      await vault.connect(addrs[0]).offsetYield(yieldAmount);
+
+      expect(await vault.connect(addrs[0]).getYield(await vault.getATokenBalance())).to.be.lt(
+        yieldAmount,
+        'User should have less yield'
+      );
+    });
+
+    it('should offset CO2 using some of the yield', async function () {
+      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
+      await vault.connect(addrs[0]).supply(ONE_ETHER);
+
+      await funcs.mineBlocks(hre, 1000, 10);
+
+      const yieldAmount = await vault.connect(addrs[0]).getYield(await vault.getATokenBalance());
+
+      await vault.connect(addrs[0]).offsetYield(yieldAmount.div(2));
+
+      expect(await vault.connect(addrs[0]).getYield(await vault.getATokenBalance())).to.be.lt(
+        yieldAmount,
+        'User should have less yield'
+      );
+    });
+
+    it('should fail because the caller does not own the vault', async function () {
+      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
+      await vault.connect(addrs[0]).supply(ONE_ETHER);
+
+      await funcs.mineBlocks(hre, 1000, 10);
+
+      const yieldAmount = await vault.connect(addrs[0]).getYield(await vault.getATokenBalance());
+
+      await expect(vault.connect(addrs[1]).offsetYield(yieldAmount)).to.be.revertedWith(
+        await errors.V_NOT_VAULT_OWNER()
+      );
+    });
+
+    it('should fail because the caller tried to offset 0 aWMatic', async function () {
+      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
+      await vault.connect(addrs[0]).supply(ONE_ETHER);
+
+      await funcs.mineBlocks(hre, 1000, 10);
+
+      const yieldAmount = await vault.connect(addrs[0]).getYield(await vault.getATokenBalance());
+
+      await expect(vault.connect(addrs[0]).offsetYield(parseEther('0.0'))).to.be.revertedWith(
+        await errors.G_AMOUNT_ZERO()
+      );
+    });
+
+    it("should fail because the caller doesn't have that much yield", async function () {
+      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
+      await vault.connect(addrs[0]).supply(ONE_ETHER);
+
+      await funcs.mineBlocks(hre, 1000, 10);
+
+      const yieldAmount = await vault.connect(addrs[0]).getYield(await vault.getATokenBalance());
+
+      await expect(vault.connect(addrs[0]).offsetYield(yieldAmount.mul(2))).to.be.revertedWith(
+        await errors.V_NOT_ENOUGH_YIELD()
+      );
     });
   });
 });

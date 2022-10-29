@@ -27,6 +27,23 @@ User already has a vault
 |---|---|---|
 | _0 | string | undefined |
 
+### G_AMOUNT_ZERO
+
+```solidity
+function G_AMOUNT_ZERO() external view returns (string)
+```
+
+Amount provided cannot be 0
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | string | undefined |
+
 ### G_APPROVAL_FAILED
 
 ```solidity
@@ -85,6 +102,23 @@ function V_NOT_ENOUGH_DEPOSITED() external view returns (string)
 ```
 
 User has not deposited enough
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | string | undefined |
+
+### V_NOT_ENOUGH_YIELD
+
+```solidity
+function V_NOT_ENOUGH_YIELD() external view returns (string)
+```
+
+User doesn&#39;t have enough yield to offset that much
 
 
 

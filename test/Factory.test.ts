@@ -29,9 +29,14 @@ describe('YieldOffseterFactory', function () {
     const errors = await Errors.deploy();
     await errors.deployed();
 
+    const RetirementLogicFactory = await hre.ethers.getContractFactory('RetirementLogic');
+    const retirementLogic = await RetirementLogicFactory.deploy();
+    await retirementLogic.deployed();
+
     const Factory = await hre.ethers.getContractFactory('YieldOffseterFactory', {
       libraries: {
         SwappingLogic: swappingLogic.address,
+        RetirementLogic: retirementLogic.address,
       },
     });
     factory = await Factory.connect(addrs[0]).deploy(AAVE_POOL, WMATIC);
