@@ -124,7 +124,7 @@ describe('YieldOffseterVault', function () {
     it('user should have yield == 0.0', async function () {
       await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
       await vault.connect(addrs[0]).supply(ONE_ETHER);
-      expect(formatEther(await vault.checkYield())).to.equal(
+      expect(formatEther(await vault.getYield(await vault.getATokenBalance()))).to.equal(
         '0.0',
         "User shouldn't have any yield"
       );
@@ -136,14 +136,8 @@ describe('YieldOffseterVault', function () {
 
       await funcs.mineBlocks(hre, 1000, 10);
 
-      const yieldAmount = await vault.connect(addrs[0]).checkYield();
+      const yieldAmount = await vault.connect(addrs[0]).getYield(await vault.getATokenBalance());
       expect(yieldAmount).to.be.gt(parseEther('0.0'), 'User should have yield');
-    });
-
-    it('checking yield should fail because user has not invested yet', async function () {
-      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
-
-      await expect(vault.connect(addrs[0]).checkYield()).to.be.revertedWith('nothing invested');
     });
 
     it('checking yield should fail because user does not own the vault', async function () {
@@ -151,7 +145,9 @@ describe('YieldOffseterVault', function () {
       await vault.connect(addrs[0]).supply(ONE_ETHER);
       await funcs.mineBlocks(hre, 1000, 10);
 
-      await expect(vault.connect(addrs[1]).checkYield()).to.be.revertedWith('not your vault');
+      await expect(
+        vault.connect(addrs[1]).getYield(await vault.getATokenBalance())
+      ).to.be.revertedWith('not your vault');
     });
   });
 
@@ -170,22 +166,19 @@ describe('YieldOffseterVault', function () {
 
       await funcs.mineBlocks(hre, 1000, 10);
 
-      const offsetable = await vault.connect(addrs[0]).calculateOffsetable();
+      const offsetable = await vault
+        .connect(addrs[0])
+        .getOffsetable(await vault.getYield(await vault.getATokenBalance()));
       expect(offsetable).to.be.gt(parseEther('0.0'), 'Offsetable should be > 0.0');
-    });
-
-    it('should fail because user has not invested yet', async function () {
-      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
-
-      await expect(vault.connect(addrs[0]).calculateOffsetable()).to.be.revertedWith(
-        'nothing invested'
-      );
     });
 
     it('should fail because user has no yield yet', async function () {
       await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
       await vault.connect(addrs[0]).supply(ONE_ETHER);
-      await expect(vault.connect(addrs[0]).calculateOffsetable()).to.be.revertedWith('no yield');
+      const offsetable = await vault
+        .connect(addrs[0])
+        .getOffsetable(await vault.getYield(await vault.getATokenBalance()));
+      expect(offsetable).to.be.eq(parseEther('0.0'), 'Offsetable should be 0.0');
     });
 
     it('should fail because user does not own the vault', async function () {
@@ -193,9 +186,9 @@ describe('YieldOffseterVault', function () {
       await vault.connect(addrs[0]).supply(ONE_ETHER);
       await funcs.mineBlocks(hre, 1000, 10);
 
-      await expect(vault.connect(addrs[1]).calculateOffsetable()).to.be.revertedWith(
-        'not your vault'
-      );
+      await expect(
+        vault.connect(addrs[1]).getOffsetable(await vault.getYield(await vault.getATokenBalance()))
+      ).to.be.revertedWith('not your vault');
     });
   });
 });

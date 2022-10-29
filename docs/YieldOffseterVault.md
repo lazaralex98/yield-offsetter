@@ -61,40 +61,6 @@ amount of WMATIC held by user in the YieldOffseter
 |---|---|---|
 | _0 | uint256 | undefined |
 
-### calculateOffsetable
-
-```solidity
-function calculateOffsetable() external view returns (uint256 offsetable)
-```
-
-Calculates how much TCO2 your current yield could offset
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| offsetable | uint256 | Amount of TCO2 that could be offset by the current yield |
-
-### checkYield
-
-```solidity
-function checkYield() external view returns (uint256 yield)
-```
-
-Calculates the amount of yield earned by the caller up until this point
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| yield | uint256 | Amount of WMATIC extra of the amount supplied to Aave |
-
 ### deposit
 
 ```solidity
@@ -105,6 +71,67 @@ Send an amount of MATIC, that gets stored as WMATIC in this vault
 
 *TODO I&#39;m keeping this MATIC native deposits because 1. it won&#39;t matter if we go multi-asset 2. Toucan offseting can only be done on Polygon for now*
 
+
+### getATokenBalance
+
+```solidity
+function getATokenBalance() external view returns (uint256)
+```
+
+Gets the amount of aWMATIC tokens that the caller has i.e. how much he invested + how much yield he has
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | Amount of aWMATIC tokens |
+
+### getOffsetable
+
+```solidity
+function getOffsetable(uint256 yield) external view returns (uint256 offsetable)
+```
+
+Calculates how much TCO2 your current yield could offset
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| yield | uint256 | Amount of aWMATIC tokens the caller wants to use to offset |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| offsetable | uint256 | Amount of TCO2 that could be offset by the current yield |
+
+### getYield
+
+```solidity
+function getYield(uint256 amount) external view returns (uint256 yield)
+```
+
+Calculates the amount of yield earned by the caller up until this point
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| amount | uint256 | Amount of aWMATIC tokens the caller holds within the vault |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| yield | uint256 | Amount of WMATIC extra of the amount supplied to Aave |
 
 ### invested
 
@@ -236,6 +263,74 @@ Emitted when a user deposits MATIC into the YieldOffseterVault
 |---|---|---|
 | guy `indexed` | address | Address of the depositor |
 | amount  | uint256 | Amount of MATIC deposited |
+
+### Invest
+
+```solidity
+event Invest(address indexed guy, uint256 amount)
+```
+
+Emitted when a user supplies MATIC to the Aave pool
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| guy `indexed` | address | Address of the supplier / investor |
+| amount  | uint256 | Amount of MATIC supplied |
+
+### Offset
+
+```solidity
+event Offset(address indexed guy, uint256 amount)
+```
+
+Emitted when a user offsets their yield
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| guy `indexed` | address | Address of the yield offseter |
+| amount  | uint256 | Amount of MATIC offset |
+
+### Withdraw
+
+```solidity
+event Withdraw(address indexed guy, uint256 amount)
+```
+
+Emitted when a user withdraws MATIC from Aave pool into the YieldOffseterVault
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| guy `indexed` | address | Address of the withdrawer |
+| amount  | uint256 | Amount of MATIC withdrawn |
+
+### Withdraw2
+
+```solidity
+event Withdraw2(address indexed guy, uint256 amount)
+```
+
+Emitted when a user withdraws MATIC from the YieldOffseterVault
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| guy `indexed` | address | Address of the withdrawer |
+| amount  | uint256 | Amount of MATIC withdrawn |
 
 
 
