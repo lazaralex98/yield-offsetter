@@ -22,4 +22,6 @@ library Errors {
     string public constant G_APPROVAL_FAILED = '4';
     /// Arrays do not have the same length
     string public constant G_ARRAYS_NOT_SAME_LENGTH = '5';
+    /// User doesn't have enough NCT to retire
+    string public constant R_INSUFFICIENT_NCT = '6';
 }

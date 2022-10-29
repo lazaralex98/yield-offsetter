@@ -61,6 +61,23 @@ Arrays do not have the same length
 |---|---|---|
 | _0 | string | undefined |
 
+### R_INSUFFICIENT_NCT
+
+```solidity
+function R_INSUFFICIENT_NCT() external view returns (string)
+```
+
+User doesn&#39;t have enough NCT to retire
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | string | undefined |
+
 ### V_NOT_ENOUGH_DEPOSITED
 
 ```solidity
