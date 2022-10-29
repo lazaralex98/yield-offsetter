@@ -125,10 +125,12 @@ contract YieldOffseterVault {
     }
 
     /// @notice Calculates how much TCO2 your current yield could offset
+    /// @param yield Amount of aWMATIC tokens the caller wants to use to offset
     /// @return offsetable Amount of TCO2 that could be offset by the current yield
-    function calculateOffsetable() public view onlyVaultOwner returns (uint256 offsetable) {
-        uint256 yield = getYield(getATokenBalance());
-        require(yield > 0, 'no yield');
+    function getOffsetable(uint256 yield) public view onlyVaultOwner returns (uint256 offsetable) {
+        if (yield == 0) {
+            return 0;
+        }
         (, uint256[] memory amounts) = SwappingLogic.calculateSwap(yield, address(wMatic));
         offsetable = amounts[amounts.length - 1];
     }

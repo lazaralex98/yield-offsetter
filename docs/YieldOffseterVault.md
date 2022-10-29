@@ -61,23 +61,6 @@ amount of WMATIC held by user in the YieldOffseter
 |---|---|---|
 | _0 | uint256 | undefined |
 
-### calculateOffsetable
-
-```solidity
-function calculateOffsetable() external view returns (uint256 offsetable)
-```
-
-Calculates how much TCO2 your current yield could offset
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| offsetable | uint256 | Amount of TCO2 that could be offset by the current yield |
-
 ### deposit
 
 ```solidity
@@ -105,6 +88,28 @@ Gets the amount of aWMATIC tokens that the caller has i.e. how much he invested 
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint256 | Amount of aWMATIC tokens |
+
+### getOffsetable
+
+```solidity
+function getOffsetable(uint256 yield) external view returns (uint256 offsetable)
+```
+
+Calculates how much TCO2 your current yield could offset
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| yield | uint256 | Amount of aWMATIC tokens the caller wants to use to offset |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| offsetable | uint256 | Amount of TCO2 that could be offset by the current yield |
 
 ### getYield
 
