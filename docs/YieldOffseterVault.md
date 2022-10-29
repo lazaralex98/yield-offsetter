@@ -78,23 +78,6 @@ Calculates how much TCO2 your current yield could offset
 |---|---|---|
 | offsetable | uint256 | Amount of TCO2 that could be offset by the current yield |
 
-### checkYield
-
-```solidity
-function checkYield() external view returns (uint256 yield)
-```
-
-Calculates the amount of yield earned by the caller up until this point
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| yield | uint256 | Amount of WMATIC extra of the amount supplied to Aave |
-
 ### deposit
 
 ```solidity
@@ -122,6 +105,28 @@ Gets the amount of aWMATIC tokens that the caller has i.e. how much he invested 
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint256 | Amount of aWMATIC tokens |
+
+### getYield
+
+```solidity
+function getYield(uint256 amount) external view returns (uint256 yield)
+```
+
+Calculates the amount of yield earned by the caller up until this point
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| amount | uint256 | Amount of aWMATIC tokens the caller holds within the vault |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| yield | uint256 | Amount of WMATIC extra of the amount supplied to Aave |
 
 ### invested
 

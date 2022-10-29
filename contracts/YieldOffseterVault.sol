@@ -117,17 +117,17 @@ contract YieldOffseterVault {
     }
 
     /// @notice Calculates the amount of yield earned by the caller up until this point
+    /// @param amount Amount of aWMATIC tokens the caller holds within the vault
     /// @return yield Amount of WMATIC extra of the amount supplied to Aave
-    function checkYield() public view onlyVaultOwner returns (uint256 yield) {
-        uint256 aTokenBalance = getATokenBalance();
-        // we are using SafeMath her because there was a sporadic underflow issue in testing
-        yield = SafeMath.sub(aTokenBalance, invested);
+    function getYield(uint256 amount) public view onlyVaultOwner returns (uint256 yield) {
+        // we are using SafeMath here because there was a sporadic underflow issue in testing
+        yield = SafeMath.sub(amount, invested);
     }
 
     /// @notice Calculates how much TCO2 your current yield could offset
     /// @return offsetable Amount of TCO2 that could be offset by the current yield
     function calculateOffsetable() public view onlyVaultOwner returns (uint256 offsetable) {
-        uint256 yield = checkYield();
+        uint256 yield = getYield(getATokenBalance());
         require(yield > 0, 'no yield');
         (, uint256[] memory amounts) = SwappingLogic.calculateSwap(yield, address(wMatic));
         offsetable = amounts[amounts.length - 1];

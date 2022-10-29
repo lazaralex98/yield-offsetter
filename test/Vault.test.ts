@@ -124,7 +124,7 @@ describe('YieldOffseterVault', function () {
     it('user should have yield == 0.0', async function () {
       await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
       await vault.connect(addrs[0]).supply(ONE_ETHER);
-      expect(formatEther(await vault.checkYield())).to.equal(
+      expect(formatEther(await vault.getYield(await vault.getATokenBalance()))).to.equal(
         '0.0',
         "User shouldn't have any yield"
       );
@@ -136,7 +136,7 @@ describe('YieldOffseterVault', function () {
 
       await funcs.mineBlocks(hre, 1000, 10);
 
-      const yieldAmount = await vault.connect(addrs[0]).checkYield();
+      const yieldAmount = await vault.connect(addrs[0]).getYield(await vault.getATokenBalance());
       expect(yieldAmount).to.be.gt(parseEther('0.0'), 'User should have yield');
     });
 
@@ -145,7 +145,9 @@ describe('YieldOffseterVault', function () {
       await vault.connect(addrs[0]).supply(ONE_ETHER);
       await funcs.mineBlocks(hre, 1000, 10);
 
-      await expect(vault.connect(addrs[1]).checkYield()).to.be.revertedWith('not your vault');
+      await expect(
+        vault.connect(addrs[1]).getYield(await vault.getATokenBalance())
+      ).to.be.revertedWith('not your vault');
     });
   });
 
