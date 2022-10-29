@@ -106,6 +106,23 @@ Send an amount of MATIC, that gets stored as WMATIC in this vault
 *TODO I&#39;m keeping this MATIC native deposits because 1. it won&#39;t matter if we go multi-asset 2. Toucan offseting can only be done on Polygon for now*
 
 
+### getATokenBalance
+
+```solidity
+function getATokenBalance() external view returns (uint256)
+```
+
+Gets the amount of aWMATIC tokens that the caller has i.e. how much he invested + how much yield he has
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | Amount of aWMATIC tokens |
+
 ### invested
 
 ```solidity

@@ -110,10 +110,16 @@ contract YieldOffseterVault {
         aavePool.supply(address(wMatic), amount, address(this), 0);
     }
 
+    /// @notice Gets the amount of aWMATIC tokens that the caller has i.e. how much he invested + how much yield he has
+    /// @return Amount of aWMATIC tokens
+    function getATokenBalance() public view onlyVaultOwner returns (uint256) {
+        return aWMatic.balanceOf(address(this));
+    }
+
     /// @notice Calculates the amount of yield earned by the caller up until this point
     /// @return yield Amount of WMATIC extra of the amount supplied to Aave
     function checkYield() public view onlyVaultOwner returns (uint256 yield) {
-        uint256 aTokenBalance = aWMatic.balanceOf(address(this));
+        uint256 aTokenBalance = getATokenBalance();
         // we are using SafeMath her because there was a sporadic underflow issue in testing
         yield = SafeMath.sub(aTokenBalance, invested);
     }
