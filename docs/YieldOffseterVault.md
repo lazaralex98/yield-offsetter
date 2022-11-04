@@ -153,13 +153,24 @@ amount of WMATIC supplied to the Aave pool
 ### offsetYield
 
 ```solidity
-function offsetYield() external nonpayable
+function offsetYield(uint256 amount) external nonpayable returns (uint256[] retirementEventIds)
 ```
 
-Withdraws the earned yield from the Aave pool &amp; uses it to offset CO2 emissions through the OffsetHelper
+Withdraws the earned yield from the Aave pool &amp; uses it to offset CO2 emissions
 
 
 
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| amount | uint256 | Amount of aWMATIC tokens the caller wants to use to offset |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| retirementEventIds | uint256[] | Array of IDs of the retirement events that were triggered |
 
 ### supply
 
@@ -284,7 +295,7 @@ Emitted when a user supplies MATIC to the Aave pool
 ### Offset
 
 ```solidity
-event Offset(address indexed guy, uint256 amount)
+event Offset(address indexed guy, uint256 amount, uint256[] retirementEventIds)
 ```
 
 Emitted when a user offsets their yield
@@ -297,6 +308,7 @@ Emitted when a user offsets their yield
 |---|---|---|
 | guy `indexed` | address | Address of the yield offseter |
 | amount  | uint256 | Amount of MATIC offset |
+| retirementEventIds  | uint256[] | undefined |
 
 ### Withdraw
 

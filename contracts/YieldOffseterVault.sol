@@ -8,6 +8,8 @@ import {WMatic} from './interfaces/WMatic.sol';
 import {IAToken} from './interfaces/IAToken.sol';
 import {YieldOffseterFactory} from './YieldOffseterFactory.sol';
 import {SwappingLogic} from './libraries/SwappingLogic.sol';
+import {Errors} from './libraries/Errors.sol';
+import {RetirementLogic} from './libraries/RetirementLogic.sol';
 
 /// @title YieldOffseterVault
 contract YieldOffseterVault {
@@ -41,7 +43,10 @@ contract YieldOffseterVault {
 
     /// Only the owner of the YieldOffseterVault can call this function
     modifier onlyVaultOwner() {
-        require(address(this) == yieldOffseterFactory.getVault(msg.sender), 'not your vault');
+        require(
+            address(this) == yieldOffseterFactory.getVault(msg.sender),
+            Errors.V_NOT_VAULT_OWNER
+        );
         _;
     }
 
@@ -62,7 +67,7 @@ contract YieldOffseterVault {
     /// @notice Emitted when a user offsets their yield
     /// @param guy Address of the yield offseter
     /// @param amount Amount of MATIC offset
-    event Offset(address indexed guy, uint256 amount);
+    event Offset(address indexed guy, uint256 amount, uint256[] retirementEventIds);
 
     /// @notice Emitted when a user withdraws MATIC from Aave pool into the YieldOffseterVault
     /// @param guy Address of the withdrawer
@@ -101,12 +106,12 @@ contract YieldOffseterVault {
     /// @notice Supplies the Aave pool with an amount of deposited WMATIC
     /// @param amount Amount to be supplied
     function supply(uint256 amount) public onlyVaultOwner {
-        require(balance >= amount, 'not enough deposited');
+        require(balance >= amount, Errors.V_NOT_ENOUGH_DEPOSITED);
         balance -= amount;
         invested += amount;
         emit Invest(msg.sender, amount);
         bool approved = wMatic.approve(address(aavePool), amount);
-        require(approved, 'approve failed');
+        require(approved, Errors.G_APPROVAL_FAILED);
         aavePool.supply(address(wMatic), amount, address(this), 0);
     }
 
@@ -135,8 +140,23 @@ contract YieldOffseterVault {
         offsetable = amounts[amounts.length - 1];
     }
 
-    /// @notice Withdraws the earned yield from the Aave pool & uses it to offset CO2 emissions through the OffsetHelper
-    function offsetYield() public onlyVaultOwner {}
+    /// @notice Withdraws the earned yield from the Aave pool & uses it to offset CO2 emissions
+    /// @param amount Amount of aWMATIC tokens the caller wants to use to offset
+    /// @return retirementEventIds Array of IDs of the retirement events that were triggered
+    function offsetYield(uint256 amount)
+        external
+        onlyVaultOwner
+        returns (uint256[] memory retirementEventIds)
+    {
+        require(amount > 0, Errors.G_AMOUNT_ZERO);
+        require(amount <= getYield(getATokenBalance()), Errors.V_NOT_ENOUGH_YIELD);
+
+        aavePool.withdraw(address(wMatic), amount, address(this));
+        uint256 nctBalance = SwappingLogic.swapToCarbon(amount, address(wMatic));
+        retirementEventIds = RetirementLogic.redeemAndRetire(nctBalance);
+
+        emit Offset(msg.sender, nctBalance, retirementEventIds);
+    }
 
     /// @notice Withdraws the supplied WMATIC from the AavePool into the YieldOffseter
     /// @param amount Amount to be withdrawn

@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { formatEther, parseEther } from 'ethers/lib/utils';
 import hre, { ethers } from 'hardhat';
 
-import { YieldOffseterFactory, YieldOffseterVault } from '../typechain-types';
+import { Errors, YieldOffseterFactory, YieldOffseterVault } from '../typechain-types';
 import { ABIs, constants, funcs } from '../utils';
 
 const { WMATIC_ABI } = ABIs;
@@ -12,6 +12,13 @@ const { AAVE_POOL, WMATIC, ONE_ETHER } = constants;
 describe('YieldOffseterVault', function () {
   let addrs: SignerWithAddress[];
   let factory: YieldOffseterFactory;
+  let errors: Errors;
+
+  before(async function () {
+    const Errors = await hre.ethers.getContractFactory('Errors');
+    errors = await Errors.deploy();
+    await errors.deployed();
+  });
 
   beforeEach(async function () {
     addrs = await ethers.getSigners();
@@ -20,9 +27,18 @@ describe('YieldOffseterVault', function () {
     const swappingLogic = await SwappingLogicFactory.deploy();
     await swappingLogic.deployed();
 
+    const Errors = await hre.ethers.getContractFactory('Errors');
+    const errors = await Errors.deploy();
+    await errors.deployed();
+
+    const RetirementLogicFactory = await hre.ethers.getContractFactory('RetirementLogic');
+    const retirementLogic = await RetirementLogicFactory.deploy();
+    await retirementLogic.deployed();
+
     const Factory = await hre.ethers.getContractFactory('YieldOffseterFactory', {
       libraries: {
         SwappingLogic: swappingLogic.address,
+        RetirementLogic: retirementLogic.address,
       },
     });
     factory = await Factory.connect(addrs[0]).deploy(AAVE_POOL, WMATIC);
@@ -63,7 +79,7 @@ describe('YieldOffseterVault', function () {
 
     it(`should fail because it's not this user's vault`, async function () {
       await expect(vault.connect(addrs[1]).deposit({ value: ONE_ETHER })).to.be.revertedWith(
-        'not your vault'
+        await errors.V_NOT_VAULT_OWNER()
       );
     });
   });
@@ -108,7 +124,9 @@ describe('YieldOffseterVault', function () {
 
     it(`should fail because it's not this user's vault`, async function () {
       await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
-      await expect(vault.connect(addrs[1]).supply(ONE_ETHER)).to.be.revertedWith('not your vault');
+      await expect(vault.connect(addrs[1]).supply(ONE_ETHER)).to.be.revertedWith(
+        await errors.V_NOT_VAULT_OWNER()
+      );
     });
   });
 
@@ -147,7 +165,7 @@ describe('YieldOffseterVault', function () {
 
       await expect(
         vault.connect(addrs[1]).getYield(await vault.getATokenBalance())
-      ).to.be.revertedWith('not your vault');
+      ).to.be.revertedWith(await errors.V_NOT_VAULT_OWNER());
     });
   });
 
@@ -188,7 +206,88 @@ describe('YieldOffseterVault', function () {
 
       await expect(
         vault.connect(addrs[1]).getOffsetable(await vault.getYield(await vault.getATokenBalance()))
-      ).to.be.revertedWith('not your vault');
+      ).to.be.revertedWith(await errors.V_NOT_VAULT_OWNER());
+    });
+  });
+
+  describe('Offset CO2', function () {
+    let vault: YieldOffseterVault;
+
+    beforeEach(async function () {
+      await factory.connect(addrs[0]).createVault();
+      const vaultAddress = await factory.getVault(addrs[0].address);
+      vault = await ethers.getContractAt('YieldOffseterVault', vaultAddress, addrs[0]);
+    });
+
+    it('should offset CO2 using all of the yield', async function () {
+      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
+      await vault.connect(addrs[0]).supply(ONE_ETHER);
+
+      await funcs.mineBlocks(hre, 1000, 10);
+
+      const yieldAmount = await vault.connect(addrs[0]).getYield(await vault.getATokenBalance());
+
+      await vault.connect(addrs[0]).offsetYield(yieldAmount);
+
+      expect(await vault.connect(addrs[0]).getYield(await vault.getATokenBalance())).to.be.lt(
+        yieldAmount,
+        'User should have less yield'
+      );
+    });
+
+    it('should offset CO2 using some of the yield', async function () {
+      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
+      await vault.connect(addrs[0]).supply(ONE_ETHER);
+
+      await funcs.mineBlocks(hre, 1000, 10);
+
+      const yieldAmount = await vault.connect(addrs[0]).getYield(await vault.getATokenBalance());
+
+      await vault.connect(addrs[0]).offsetYield(yieldAmount.div(2));
+
+      expect(await vault.connect(addrs[0]).getYield(await vault.getATokenBalance())).to.be.lt(
+        yieldAmount,
+        'User should have less yield'
+      );
+    });
+
+    it('should fail because the caller does not own the vault', async function () {
+      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
+      await vault.connect(addrs[0]).supply(ONE_ETHER);
+
+      await funcs.mineBlocks(hre, 1000, 10);
+
+      const yieldAmount = await vault.connect(addrs[0]).getYield(await vault.getATokenBalance());
+
+      await expect(vault.connect(addrs[1]).offsetYield(yieldAmount)).to.be.revertedWith(
+        await errors.V_NOT_VAULT_OWNER()
+      );
+    });
+
+    it('should fail because the caller tried to offset 0 aWMatic', async function () {
+      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
+      await vault.connect(addrs[0]).supply(ONE_ETHER);
+
+      await funcs.mineBlocks(hre, 1000, 10);
+
+      const yieldAmount = await vault.connect(addrs[0]).getYield(await vault.getATokenBalance());
+
+      await expect(vault.connect(addrs[0]).offsetYield(parseEther('0.0'))).to.be.revertedWith(
+        await errors.G_AMOUNT_ZERO()
+      );
+    });
+
+    it("should fail because the caller doesn't have that much yield", async function () {
+      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
+      await vault.connect(addrs[0]).supply(ONE_ETHER);
+
+      await funcs.mineBlocks(hre, 1000, 10);
+
+      const yieldAmount = await vault.connect(addrs[0]).getYield(await vault.getATokenBalance());
+
+      await expect(vault.connect(addrs[0]).offsetYield(yieldAmount.mul(2))).to.be.revertedWith(
+        await errors.V_NOT_ENOUGH_YIELD()
+      );
     });
   });
 });
