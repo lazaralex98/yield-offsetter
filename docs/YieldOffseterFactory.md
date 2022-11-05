@@ -66,6 +66,28 @@ Returns the YieldOffseterVault for `guy`
 |---|---|---|
 | _0 | address | Address of the YieldOffseterVault that `guy` owns |
 
+### getVaultOwner
+
+```solidity
+function getVaultOwner(address vault) external view returns (address)
+```
+
+Gets the address of the owner of the YieldOffseterVault
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| vault | address | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | Address of the owner |
+
 ### wMatic
 
 ```solidity

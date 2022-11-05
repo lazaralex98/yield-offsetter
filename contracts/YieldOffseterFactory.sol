@@ -20,6 +20,8 @@ contract YieldOffseterFactory {
 
     /// each user is entitled to only 1 YieldOffseterVault
     mapping(address => address) private vaults;
+    /// each vault is owned by only 1 user
+    mapping(address => address) private vaultOwners;
 
     // ============================================
     // ================== Events ==================
@@ -50,6 +52,7 @@ contract YieldOffseterFactory {
         require(vaults[msg.sender] == address(0), Errors.F_ALREADY_HAVE_VAULT);
         YieldOffseterVault newVault = new YieldOffseterVault(address(aavePool), address(wMatic));
         vaults[msg.sender] = address(newVault);
+        vaultOwners[address(newVault)] = msg.sender;
         emit VaultCreated(msg.sender, vaults[msg.sender]);
         return vaults[msg.sender];
     }
@@ -59,5 +62,11 @@ contract YieldOffseterFactory {
     /// @return Address of the YieldOffseterVault that `guy` owns
     function getVault(address guy) public view returns (address) {
         return vaults[guy];
+    }
+
+    /// @notice Gets the address of the owner of the YieldOffseterVault
+    /// @return Address of the owner
+    function getVaultOwner(address vault) public view returns (address) {
+        return vaultOwners[vault];
     }
 }
