@@ -47,6 +47,10 @@ contract YieldOffseterVault {
             address(this) == yieldOffseterFactory.getVault(msg.sender),
             Errors.V_NOT_VAULT_OWNER
         );
+        require(
+            msg.sender == yieldOffseterFactory.getVaultOwner(address(this)),
+            Errors.V_NOT_VAULT_OWNER
+        );
         _;
     }
 
@@ -72,12 +76,12 @@ contract YieldOffseterVault {
     /// @notice Emitted when a user withdraws MATIC from Aave pool into the YieldOffseterVault
     /// @param guy Address of the withdrawer
     /// @param amount Amount of MATIC withdrawn
-    event Withdraw(address indexed guy, uint256 amount);
+    event WithdrawFromAave(address indexed guy, uint256 amount);
 
     /// @notice Emitted when a user withdraws MATIC from the YieldOffseterVault
     /// @param guy Address of the withdrawer
     /// @param amount Amount of MATIC withdrawn
-    event Withdraw2(address indexed guy, uint256 amount);
+    event WithdrawFromVault(address indexed guy, uint256 amount);
 
     // ============================================
     // ================ Constructor ===============
@@ -158,11 +162,28 @@ contract YieldOffseterVault {
         emit Offset(msg.sender, nctBalance, retirementEventIds);
     }
 
-    /// @notice Withdraws the supplied WMATIC from the AavePool into the YieldOffseter
+    /// @notice Withdraws the supplied WMATIC from the AavePool into the YieldOffseterVault
     /// @param amount Amount to be withdrawn
-    function withdraw(uint256 amount) public onlyVaultOwner {}
+    function withdrawFromAave(uint256 amount) public onlyVaultOwner {
+        require(amount > 0, Errors.G_AMOUNT_ZERO);
+        require(amount <= invested, Errors.V_NOT_ENOUGH_INVESTED);
+        invested -= amount;
+        balance += amount;
+        emit WithdrawFromAave(msg.sender, amount);
+        aavePool.withdraw(address(wMatic), amount, address(this));
+    }
 
-    /// @notice Withdraws the deposited WMATIC from the YieldOffseter
+    /// @notice Withdraws the deposited MATIC from the YieldOffseter
     /// @param amount Amount to be withdrawn
-    function withdraw2(uint256 amount) public onlyVaultOwner {}
+    function withdrawFromVault(uint256 amount) public onlyVaultOwner {
+        require(amount > 0, Errors.G_AMOUNT_ZERO);
+        require(amount <= balance, Errors.V_NOT_ENOUGH_BALANCE);
+        balance -= amount;
+        address owner = yieldOffseterFactory.getVaultOwner(address(this));
+        emit WithdrawFromVault(owner, amount);
+        wMatic.withdraw(amount);
+        payable(owner).transfer(amount);
+    }
+
+    receive() external payable {}
 }
