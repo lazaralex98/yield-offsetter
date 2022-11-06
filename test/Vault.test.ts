@@ -1,5 +1,6 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
+import { BigNumber } from 'ethers';
 import { formatEther, parseEther } from 'ethers/lib/utils';
 import hre, { ethers } from 'hardhat';
 
@@ -287,6 +288,58 @@ describe('YieldOffseterVault', function () {
 
       await expect(vault.connect(addrs[0]).offsetYield(yieldAmount.mul(2))).to.be.revertedWith(
         await errors.V_NOT_ENOUGH_YIELD()
+      );
+    });
+  });
+
+  describe('Withdrawing', function () {
+    let vault: YieldOffseterVault;
+    let invested: BigNumber;
+    let balance: BigNumber;
+
+    beforeEach(async function () {
+      await factory.connect(addrs[0]).createVault();
+      const vaultAddress = await factory.getVault(addrs[0].address);
+      vault = await ethers.getContractAt('YieldOffseterVault', vaultAddress, addrs[0]);
+
+      await vault.connect(addrs[0]).deposit({ value: ONE_ETHER });
+      await vault.connect(addrs[0]).supply(ONE_ETHER);
+
+      invested = await vault.invested();
+      balance = await vault.balance();
+    });
+
+    it('should withdraw from Aave pool', async function () {
+      await vault.connect(addrs[0]).withdrawFromAave(ONE_ETHER);
+
+      expect(await vault.connect(addrs[0]).invested()).to.be.eq(
+        invested.sub(ONE_ETHER),
+        'User should have less by 1.0 invested in Aave'
+      );
+      expect(await vault.connect(addrs[0]).balance()).to.be.eq(
+        balance.add(ONE_ETHER),
+        'User should have 1.0 more in the vault'
+      );
+    });
+
+    it('should withdraw from Aave & vault', async function () {
+      await vault.connect(addrs[0]).withdrawFromAave(ONE_ETHER);
+
+      const inWallet = await ethers.provider.getBalance(addrs[0].address);
+      const tx = await (await vault.connect(addrs[0]).withdrawFromVault(ONE_ETHER)).wait();
+      const gasCost = tx.gasUsed.mul(tx.effectiveGasPrice);
+
+      expect(await vault.connect(addrs[0]).invested()).to.be.eq(
+        parseEther('0.0'),
+        'User should have 0.0 invested in Aave'
+      );
+      expect(await vault.connect(addrs[0]).balance()).to.be.eq(
+        parseEther('0.0'),
+        'User should have 0.0 balance in the vault'
+      );
+      expect(await ethers.provider.getBalance(addrs[0].address)).to.be.eq(
+        inWallet.add(ONE_ETHER).sub(gasCost),
+        'User should have the same in their wallet as before depositing in vault (minus gas)'
       );
     });
   });

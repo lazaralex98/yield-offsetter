@@ -205,13 +205,13 @@ interface to the WMATIC token
 |---|---|---|
 | _0 | contract WMatic | undefined |
 
-### withdraw
+### withdrawFromAave
 
 ```solidity
-function withdraw(uint256 amount) external nonpayable
+function withdrawFromAave(uint256 amount) external nonpayable
 ```
 
-Withdraws the supplied WMATIC from the AavePool into the YieldOffseter
+Withdraws the supplied WMATIC from the AavePool into the YieldOffseterVault
 
 
 
@@ -221,13 +221,13 @@ Withdraws the supplied WMATIC from the AavePool into the YieldOffseter
 |---|---|---|
 | amount | uint256 | Amount to be withdrawn |
 
-### withdraw2
+### withdrawFromVault
 
 ```solidity
-function withdraw2(uint256 amount) external nonpayable
+function withdrawFromVault(uint256 amount) external nonpayable
 ```
 
-Withdraws the deposited WMATIC from the YieldOffseter
+Withdraws the deposited MATIC from the YieldOffseter
 
 
 
@@ -310,10 +310,10 @@ Emitted when a user offsets their yield
 | amount  | uint256 | Amount of MATIC offset |
 | retirementEventIds  | uint256[] | undefined |
 
-### Withdraw
+### WithdrawFromAave
 
 ```solidity
-event Withdraw(address indexed guy, uint256 amount)
+event WithdrawFromAave(address indexed guy, uint256 amount)
 ```
 
 Emitted when a user withdraws MATIC from Aave pool into the YieldOffseterVault
@@ -327,10 +327,10 @@ Emitted when a user withdraws MATIC from Aave pool into the YieldOffseterVault
 | guy `indexed` | address | Address of the withdrawer |
 | amount  | uint256 | Amount of MATIC withdrawn |
 
-### Withdraw2
+### WithdrawFromVault
 
 ```solidity
-event Withdraw2(address indexed guy, uint256 amount)
+event WithdrawFromVault(address indexed guy, uint256 amount)
 ```
 
 Emitted when a user withdraws MATIC from the YieldOffseterVault

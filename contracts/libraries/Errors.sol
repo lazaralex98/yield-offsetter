@@ -28,4 +28,8 @@ library Errors {
     string public constant G_AMOUNT_ZERO = '7';
     /// User doesn't have enough yield to offset that much
     string public constant V_NOT_ENOUGH_YIELD = '8';
+    /// User doesn't have enough invested to withdraw that much
+    string public constant V_NOT_ENOUGH_INVESTED = '9';
+    /// User doesn't have enough balance in the vault to withdraw that much
+    string public constant V_NOT_ENOUGH_BALANCE = '10';
 }

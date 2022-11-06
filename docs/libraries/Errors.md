@@ -95,6 +95,23 @@ User doesn&#39;t have enough NCT to retire
 |---|---|---|
 | _0 | string | undefined |
 
+### V_NOT_ENOUGH_BALANCE
+
+```solidity
+function V_NOT_ENOUGH_BALANCE() external view returns (string)
+```
+
+User doesn&#39;t have enough balance in the vault to withdraw that much
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | string | undefined |
+
 ### V_NOT_ENOUGH_DEPOSITED
 
 ```solidity
@@ -102,6 +119,23 @@ function V_NOT_ENOUGH_DEPOSITED() external view returns (string)
 ```
 
 User has not deposited enough
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | string | undefined |
+
+### V_NOT_ENOUGH_INVESTED
+
+```solidity
+function V_NOT_ENOUGH_INVESTED() external view returns (string)
+```
+
+User doesn&#39;t have enough invested to withdraw that much
 
 
 

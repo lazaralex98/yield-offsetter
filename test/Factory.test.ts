@@ -62,6 +62,12 @@ describe('YieldOffseterFactory', function () {
     expect(await vaultContract.wMatic()).to.equal(WMATIC);
   });
 
+  it('should be able to get owner of a vault', async function () {
+    await factory.connect(addrs[0]).createVault();
+    const vaultAddress = await factory.getVault(addrs[0].address);
+    expect(await factory.connect(addrs[1]).getVaultOwner(vaultAddress)).to.equal(addrs[0].address);
+  });
+
   it('should fail to create a second vault', async function () {
     await factory.connect(addrs[0]).createVault();
     await expect(factory.connect(addrs[0]).createVault()).to.be.revertedWith(
