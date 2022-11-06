@@ -7,12 +7,16 @@ import { constants } from '../utils';
 
 const { AAVE_POOL, WMATIC } = constants;
 
-describe('YieldOffseterFactory', function () {
+describe('Unit tests for YieldOffseterFactory on Hardhat network', function () {
   let addrs: SignerWithAddress[];
   let factory: YieldOffseterFactory;
   let errors: Errors;
 
   before(async function () {
+    if (hre.network.name !== 'hardhat') {
+      this.skip();
+    }
+
     const Errors = await hre.ethers.getContractFactory('Errors');
     errors = await Errors.deploy();
     await errors.deployed();
