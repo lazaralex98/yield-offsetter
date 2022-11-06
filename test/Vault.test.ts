@@ -10,12 +10,16 @@ import { ABIs, constants, funcs } from '../utils';
 const { WMATIC_ABI } = ABIs;
 const { AAVE_POOL, WMATIC, ONE_ETHER } = constants;
 
-describe('YieldOffseterVault', function () {
+describe('Unit tests for YieldOffseterVault on Hardhat network', function () {
   let addrs: SignerWithAddress[];
   let factory: YieldOffseterFactory;
   let errors: Errors;
 
   before(async function () {
+    if (hre.network.name !== 'hardhat') {
+      this.skip();
+    }
+
     const Errors = await hre.ethers.getContractFactory('Errors');
     errors = await Errors.deploy();
     await errors.deployed();
